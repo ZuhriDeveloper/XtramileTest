@@ -1,2 +1,2 @@
 # XtramileTest
-Repo for technical interview company xtramile
+Just run the WebApi and WebUi
