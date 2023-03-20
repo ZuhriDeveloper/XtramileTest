@@ -1,0 +1,107 @@
+﻿@model WeatherForecast
+@{
+    ViewBag.Title = "Daftar Member";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center mb-5">Weather Forecast</h1>
+            <form>
+                <div class="form-group">
+                    <label for="dropdown1">Country</label>
+                    <select id="dropdown1" class="form-control">
+                        <option value="">-- Select an option --</option>
+                        @for (int i = 0; i <= @Model.ListCountry.Count - 1; i++)
+                        {
+                            <option value="@Model.ListCountry[i].CountryId">@Model.ListCountry[i].CountryName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dropdown2">Dropdown 2</label>
+                    <select id="dropdown2" class="form-control" disabled>
+                        <option value="">-- Select an option --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="textbox">Text Box</label>
+                    <textarea id="textbox" class="form-control" rows="5" readonly></textarea>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('#dropdown1').change(function () {
+                var dropdown1Value = $(this).val();
+                console.log(dropdown1Value);
+                //alert(dropdown1Value);
+                $('#dropdown2').attr('disabled', 'disabled');
+                $('#textbox').val('');
+
+                //$.get('/WeatherForecast/GetCityOptions', { countryId: dropdown1Value })
+                //    .done(function (data) {
+                //        console.log(data);
+                //        $('#dropdown2').removeAttr('disabled');
+                //        $('#dropdown2').empty();
+                //        $.each(data, function (i, item) {
+                //            $('#dropdown2').append($('<option>', {
+                //                value: item.id,
+                //                text: item.name
+                //            }));
+                //        });
+                //    })
+                //    .fail(function (xhr, textStatus, error) {
+                //        console.log(xhr.responseText);
+                //    });
+                $.ajax({
+                    url: "/weatherforecast/GetCityOptions?countryId=" + dropdown1Value,
+                    type: "GET",
+                    success: function (result) {
+                        console.log(result);
+                        $('#dropdown2').removeAttr('disabled');
+                        $('#dropdown2').empty();
+                        var options = '<option value="">Select a city</option>';
+                        $.each(result, function (key, value) {
+                            options += '<option value="' + value.id + '">' + value.name + '</option>';
+                        });
+                        $("#dropdown2").html(options);
+                    },
+                    error: function () {
+                        alert("Error getting city options.");
+                    }
+                });
+            });
+
+            $('#dropdown2').change(function () {
+                var dropdown2Value = $(this).val();
+
+                //$.get('/api/MyApi/GetTextboxValue', { dropdown2Value: dropdown2Value })
+                //    .done(function (data) {
+                //        $('#textbox').val(data);
+                //    })
+                //    .fail(function (xhr, textStatus, error) {
+                //        console.log(xhr.responseText);
+                //    });
+
+                $.ajax({
+                    url: "/weatherforecast/GetWeatherInfo?cityId=" + dropdown2Value,
+                    type: "GET",
+                    success: function (result) {
+                        console.log(result);
+                         $('#textbox').val(result);
+                    },
+                    error: function () {
+                        alert("Error getting city options.");
+                    }
+                });
+            });
+
+
+        });
+    </script>
+}
